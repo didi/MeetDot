@@ -1,0 +1,60 @@
+# #################################
+# Basic inference parameters for speaker-id. We have first a network that
+# computes some embeddings. On the top of that, we employ a classifier.
+#
+# Author:
+#  * Mirco Ravanelli 2021
+# #################################
+
+# pretrain folders:
+pretrained_path: src/services/asr/language_id/models/best
+
+# Model parameters
+n_mels: 23
+sample_rate: 16000
+n_classes: 4 # In this case, we have 28 speakers
+emb_dim: 192 # dimensionality of the embeddings
+
+# Feature extraction
+compute_features: !new:speechbrain.lobes.features.Fbank
+  n_mels: !ref <n_mels>
+
+# Mean and std normalization of the input features
+mean_var_norm: !new:speechbrain.processing.features.InputNormalization
+  norm_type: sentence
+  std_norm: False
+
+# To design a custom model, either just edit the simple CustomModel
+# class that's listed here, or replace this `!new` call with a line
+# pointing to a different file you've defined.
+embedding_model: !new:speechbrain.lobes.models.ECAPA_TDNN.ECAPA_TDNN
+  input_size: !ref <n_mels>
+  channels: [1024, 1024, 1024, 1024, 3072]
+  kernel_sizes: [5, 3, 3, 3, 1]
+  dilations: [1, 2, 3, 4, 1]
+  attention_channels: 128
+  lin_neurons: !ref <emb_dim>
+
+classifier: !new:speechbrain.lobes.models.ECAPA_TDNN.Classifier
+  input_size: !ref <emb_dim>
+  out_neurons: !ref <n_classes>
+
+label_encoder: !new:speechbrain.dataio.encoder.CategoricalEncoder
+
+# Objects in "modules" dict will have their parameters moved to the correct
+# device, as well as having train()/eval() called on them by the Brain class.
+modules:
+  compute_features: !ref <compute_features>
+  embedding_model: !ref <embedding_model>
+  classifier: !ref <classifier>
+  mean_var_norm: !ref <mean_var_norm>
+
+pretrainer: !new:speechbrain.utils.parameter_transfer.Pretrainer
+  loadables:
+    embedding_model: !ref <embedding_model>
+    classifier: !ref <classifier>
+    label_encoder: !ref <label_encoder>
+  paths:
+    embedding_model: !ref <pretrained_path>/embedding_model.ckpt
+    classifier: !ref <pretrained_path>/classifier.ckpt
+    label_encoder: !ref <pretrained_path>/../label_encoder.txt

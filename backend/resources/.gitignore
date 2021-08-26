@@ -1,0 +1,3 @@
+# Don't commit secret keys
+credentials.json
+keys.json

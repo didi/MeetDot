@@ -1,0 +1,127 @@
+stages:
+  - build
+  - test
+  - nightly
+  - report_coverage
+  - deploy
+
+cache:
+  paths:
+    - env
+
+variables:
+  GIT_SUBMODULE_STRATEGY: normal
+
+# When setting up on a new machine:
+# - Install conda, node, yarn
+# - Create test environments: stream_speech_test, stream_speech_deploy
+
+build:
+  stage: build
+  script:
+    # Commands to run tests on our server
+    - conda activate stream_speech_test
+    - pip install -r backend/requirements.txt --use-deprecated=legacy-resolver
+    - pip install -e backend
+  only:
+    - /^test-me-.*/
+    - master
+    - /^stable-.*/
+    - schedules
+
+test:
+  stage: test
+  script:
+    - conda activate stream_speech_test
+    - python env_setup.py --copy-keys --clobber
+    - cd backend
+    - coverage run --source=. -m pytest
+  only:
+    - /^test-me-.*/
+    - master
+    - /^stable-.*/
+  except:
+    - schedules
+  # coverage: '/^TOTAL.*\s+(\d+\%)$/' # This doesn't work. No idea why
+  artifacts:
+    paths:
+      - backend/.coverage
+
+report_coverage:
+  stage: report_coverage
+  script:
+    - conda activate stream_speech_test
+    - cd backend
+    - coverage report | tee .coverage.out
+    - coverage_log=/home/shared/ci/coverage/streaming-speech.txt
+    # File is: date | commit title | hash | coverage number
+    - echo "`date` | $CI_COMMIT_TITLE | $CI_COMMIT_SHA | `sed -ne 's/TOTAL.* \([0-9]*\)%/\1/p' .coverage.out`" >> $coverage_log
+  only:
+    - master
+  except:
+    - schedules
+  dependencies:
+    - test
+
+nightly:
+  stage: nightly
+  script:
+    - conda activate stream_speech_test
+    - python env_setup.py --copy-keys --clobber
+    - cd backend
+    - CONFIG=src/services/evaluation/nightly_configs/kaldi_didi_beta0.1_35ms_mask4.json
+    - EPOCH=`date +%s`
+    - sed -i "s/nightly-run-cache-key/nightly-run-cache-key-$EPOCH/" $CONFIG
+    - python src/services/evaluation/evaluate.py --st --st-datasets dwc2_leading_silence_trimmed-en-zh dwc2_leading_silence_trimmed-zh-en --name nightly --overwrite -c $CONFIG --dataset_dir=$DATASET_DIR
+    - cp -r src/services/evaluation/outputs/nightly "/home/shared/speech_translation/nightly-run-outputs/$EPOCH"
+  artifacts:
+    paths:
+      - backend/src/services/evaluation/outputs/nightly
+    expire_in: 3 mos
+    when: always
+  only:
+    - schedules
+
+# Deploy jobs
+build-deploy:
+  stage: build
+  script:
+    # Commands to run tests on our server
+    - conda activate stream_speech_deploy
+    - pip install -r backend/requirements.txt --use-deprecated=legacy-resolver
+    - pip install -e backend
+  tags:
+    - deploy
+  only:
+    - deploy
+    - /^stable-.*/
+
+deploy:
+  stage: deploy
+  script:
+    - git ls-files --recurse-submodules > files.log
+    - rsync --files-from=files.log . $DEPLOY_ROOT
+    - conda activate stream_speech_deploy
+    - cd $DEPLOY_ROOT
+
+    # Start frontend
+    - cd frontend
+    - yarn install
+    - yarn run build --dest ../dist
+    - cd ..
+
+    # Update backend
+    - pip install -e backend
+    - python env_setup.py --copy-keys
+    - cd backend
+    - systemctl --user restart meet-backend
+    - cd ..
+
+  # Our version of gitlab is old and only supports a string here
+  environment: deploy
+
+  tags:
+    - deploy
+  only:
+    - deploy
+    - /^stable-.*/
