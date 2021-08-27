@@ -12,7 +12,6 @@ catalogue==1.0.0
 certifi==2020.4.5.2
 cffi==1.14.0
 cfgv==3.2.0
-chardet==3.0.4
 CJKwrap==2.2
 click==7.1.2
 ConfigArgParse==1.4
@@ -90,7 +89,6 @@ pytest==6.2.1
 python-dateutil==2.8.1
 python-dotenv==0.15.0
 python-engineio==3.13.2
-python-Levenshtein==0.12.0
 python-socketio==4.6.0
 python-speech-features==0.6
 pytz==2020.1
