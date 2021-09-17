@@ -1,6 +1,6 @@
-<div align="center">
-![logo](./frontend/public/meetdot-logo.png)
-</div>
+<p align="center">
+  <img src="./frontend/public/meetdot-logo.png" />
+</p>
 
 # MeetDot: Speech Translation for Video Calling
 
