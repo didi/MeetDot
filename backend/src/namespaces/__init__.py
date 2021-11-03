@@ -1,0 +1,6 @@
+from .chat.chat_namespace import ChatNamespace
+from .feedback.feedback_namespace import FeedbackNamespace
+from .image_translation.image_translation_namespace import ImageTranslationNamespace
+from .meeting.meeting_namespace import MeetingNamespace
+from .post_meeting.post_meeting_namespace import PostMeetingNamespace
+from .word_guessing.namespace import WordGuessingNamespace

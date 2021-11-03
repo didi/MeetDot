@@ -1,0 +1,28 @@
+{
+  "asr": {
+    "encoding": null,
+    "language": "en-US",
+    "provider": "wenet",
+    "chunk_size": 1600,
+    "sample_rate_hertz": 16000
+  },
+  "captioning": {
+    "strategy": "linewise_scroll",
+    "num_lines": 2,
+    "enable_highlight": true,
+    "characters_per_line": 60
+  },
+  "translation": {
+    "provider": "didi",
+    "bias_beta": 0.2,
+    "custom_args": { "cache_key_prefix": "nightly-run-cache-key" },
+    "min_interval_ms": 35,
+    "min_interval_char": 0
+  },
+  "post_translation": {
+    "mask_k": 4,
+    "translate_k": 0,
+    "remove_profanity": true,
+    "add_punctuation": false
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint src locales --ext .vue,.json,.js"
+  },
+  "dependencies": {
+    "@daily-co/daily-js": "^0.14.0",
+    "@intlify/eslint-plugin-vue-i18n": "^0.11.1",
+    "adapterjs": "^0.15.5",
+    "axios": "^0.21.1",
+    "core-js": "^3.6.5",
+    "lodash": "^4.17.20",
+    "recordrtc": "^5.6.1",
+    "socket.io-client": "2.3.1",
+    "socket.io-stream": "^0.9.1",
+    "vue": "^2.6.12",
+    "vue-audio-visual": "^2.2.2",
+    "vue-i18n": "^8.24.1",
+    "vue-inline-svg": "^2.0.0",
+    "vue-js-modal": "^2.0.0-rc.6",
+    "vue-material-design-icons": "^4.11.0",
+    "vue-router": "^3.4.9",
+    "vue-slider-component": "^3.2.11",
+    "vue-socket.io": "^3.0.10",
+    "vue-toast-notification": "^0.6.0",
+    "vuex": "^3.6.0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/eslint-plugin": "^4.2.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.26.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.2",
+    "eslint-plugin-json": "^3.0.0",
+    "eslint-plugin-vue": "^7.9.0",
+    "sass": "^1.34.1",
+    "sass-loader": "^10.1.0",
+    "vue-svg-loader": "^0.16.0",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
